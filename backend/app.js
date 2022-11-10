@@ -1,47 +1,27 @@
-require("dotenv").config();
-require("express-async-errors");
+require('dotenv').config();
 
-// middleware
-const notFoundMiddleware = require("./middleware/not-found");
-const errorHandlerMiddleware = require("./middleware/error-handler");
-
-// express
-const express = require("express");
+const express = require('express');
 const app = express();
 
-// database
-const connectDB = require("./db/connect");
+const userRoutes = require('./routes/user');
 
-//  routers
-const authRouter = require("./routes/authRoutes");
-// const userRouter = require("./routes/userRoutes");
-// const productRouter = require("./routes/productRoutes");
-// const reviewRouter = require("./routes/reviewRoutes");
-// const orderRouter = require("./routes/orderRoutes");
-
-app.use(express.json());
-
-app.get("/", (req, res) => {
-  res.send("Welcome to the Page");
+app.use((req, res, next) => {
+  console.log('Requête reçue !');
+  next();
 });
 
-app.use("/api/vl/auth", authRouter);
+app.use((req, res, next) => {
+  res.status(201);
+  next();
+});
 
-app.use(notFoundMiddleware);
-app.use(errorHandlerMiddleware);
+app.use((req, res, next) => {
+  res.json({ message: 'Votre requête a bien été reçue !' });
+  next();
+});
 
-// app.use();
+app.use((req, res, next) => {
+  console.log('Réponse envoyée avec succès !');
+});
 
-const port = process.env.PORT || 3000;
-const start = async () => {
-  try {
-    await connectDB(process.env.MONGO_URI);
-    app.listen(port, () =>
-      console.log(`Server is listening on port ${port}...`)
-    );
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-start();
+module.exports = app;
