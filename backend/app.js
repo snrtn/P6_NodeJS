@@ -3,25 +3,27 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
-const userRoutes = require('./routes/user');
+const userRouter = require('./routes/userRouter');
+const notFoundMiddleware = require('./middleware/not-found');
+const errorHandlerMiddleware = require('./middleware/error-handler');
 
-app.use((req, res, next) => {
-  console.log('Requête reçue !');
-  next();
-});
+app.use(express.json());
 
-app.use((req, res, next) => {
-  res.status(201);
-  next();
-});
+app.use('/api', userRouter);
 
-app.use((req, res, next) => {
-  res.json({ message: 'Votre requête a bien été reçue !' });
-  next();
-});
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 
-app.use((req, res, next) => {
-  console.log('Réponse envoyée avec succès !');
-});
+const port = process.env.PORT || 3000;
 
-module.exports = app;
+const start = async () => {
+  try {
+    app.listen(port, () =>
+      console.log(`Server is listening on port ${port}...`)
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+start();
