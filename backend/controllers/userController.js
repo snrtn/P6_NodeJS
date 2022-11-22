@@ -1,6 +1,11 @@
 const jwt = require('jsonwebtoken');
 const { BadRequestError } = require('../errors')
 
+const signup = async(req, res, next) => {
+  
+
+};
+
 const login = async (req, res) => {
   const { email, password } = req.body
 
@@ -19,4 +24,5 @@ const login = async (req, res) => {
 
 module.exports = {
   login,
+  signup,
 }
