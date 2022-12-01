@@ -1,26 +1,44 @@
-const jwt = require('jsonwebtoken');
-const { BadRequestError } = require('../errors')
+const User = require('../models/userModels');
+const { StatusCodes } = require('http-status-codes');
+const CustomError = require('../errors');
+const { attachCookiesToResponse } = require('../utils');
 
-const signup = async(req, res, next) => {
-  
+const signup = async (req, res) => {
+  const { email, password } = req.body;
 
+  const emailAlreadyExists = await User.findOne({ email });
+
+  if (emailAlreadyExists) {
+    throw new CustomError.BadRequestError('Email already exists');
+  }
+
+  const user = await User.create({ email, password });
+
+  attachCookiesToResponse({ res, user: { id: user.id, email: user.email }  });
+  res.status(StatusCodes.CREATED).json({ user: user });
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body
+  const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new BadRequestError('Please provide email and password')
+    throw new CustomError.BadRequestError('Please provide email and password');
   }
 
-  const id = new Date().getDate()
+  const user = await User.findOne({ email });
 
-  const token = jwt.sign({ id, email }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  })
+  if (!user) {
+    throw new CustomError.UnauthenticatedError('Invalid Credentials Email');
+  }
+  const isPasswordCorrect = await user.comparePassword(password);
 
-  res.status(200).json({ msg: 'user created', token })
-}
+  if (!isPasswordCorrect) {
+    throw new CustomError.UnauthenticatedError('Invalid Credentials Password');
+  }
+  console.log(user)
+  attachCookiesToResponse({ res, user: { id: user.id, email: user.email } });
+  res.status(StatusCodes.OK).json({ user: user });
+};
 
 module.exports = {
   login,

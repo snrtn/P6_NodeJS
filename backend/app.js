@@ -3,6 +3,8 @@ require('express-async-errors');
 
 const express = require('express');
 const app = express();
+const cors = require('cors')
+const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 
 const userRouter = require('./routes/userRouter');
@@ -14,8 +16,10 @@ const errorHandlerMiddleware = require('./middleware/error-handler');
 
 app.use(mongoSanitize());
 app.use(express.json());
+app.use(cors())
+app.use(cookieParser('secret'));
 
-app.use('/api', userRouter);
+app.use('/api/auth', userRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
