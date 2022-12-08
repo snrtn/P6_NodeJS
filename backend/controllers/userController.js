@@ -1,7 +1,7 @@
 const User = require('../models/userModels');
-const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const { attachCookiesToResponse } = require('../utils');
+const { StatusCodes } = require('http-status-codes');
 
 const signup = async (req, res) => {
   const { email, password } = req.body;

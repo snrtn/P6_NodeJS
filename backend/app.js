@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 
 const userRouter = require('./routes/userRouter');
+const sauceRouter = require('./routes/sauceRouter');
 
 const connectDB = require('./db/connect');
 
@@ -20,6 +21,7 @@ app.use(cors())
 app.use(cookieParser('secret'));
 
 app.use('/api/auth', userRouter);
+app.use('/api/sauces', sauceRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
