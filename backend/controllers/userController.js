@@ -1,6 +1,6 @@
 const User = require('../models/userModels');
 const CustomError = require('../errors');
-const { attachCookiesToResponse } = require('../utils');
+const { attachCookiesToResponse, createJWT } = require('../utils');
 const { StatusCodes } = require('http-status-codes');
 
 const signup = async (req, res) => {
@@ -36,8 +36,8 @@ const login = async (req, res) => {
     throw new CustomError.UnauthenticatedError('Invalid Credentials Password');
   }
   console.log(user)
-  attachCookiesToResponse({ res, user: { id: user.id, email: user.email } });
-  res.status(StatusCodes.OK).json({ user: user });
+  const token = createJWT( { userId: user.id, email: user.email } );
+  res.status(StatusCodes.OK).json({ user: user, token: token });
 };
 
 module.exports = {
