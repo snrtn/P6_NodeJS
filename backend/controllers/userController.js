@@ -12,15 +12,17 @@ const CustomError = require('../errors');
 const signup = async (req, res) => {
   const { email, password } = req.body;
 
+  // cherche le email
   const emailAlreadyExists = await User.findOne({ email });
-
+  // si il y a même email, error
   if (emailAlreadyExists) {
     throw new CustomError.BadRequestError('Email already exists');
   }
 
-  const user = await User.create({ userId, email, password });
+  // si il n'y a pas même email, create a new 
+  const user = await User.create({ email, password });
 
-  attachCookiesToResponse({ res, user: { userId: user.id, id: user.id, email: user.email }  });
+  attachCookiesToResponse({ res, user: { userId: user.id, email: user.email }  });
 
   // enregistre l'utilisateur dans la base de données
   res.status(StatusCodes.CREATED).json({ user: user });
@@ -44,7 +46,7 @@ const login = async (req, res) => {
     throw new CustomError.UnauthenticatedError('Invalid Credentials Password');
   }
   const token = createJWT( { userId: user.id, email: user.email } );
-  res.status(StatusCodes.OK).json({ user: user, token: token });
+  res.status(StatusCodes.OK).json({ userId: user.id, token: token });
 };
 
 module.exports = {

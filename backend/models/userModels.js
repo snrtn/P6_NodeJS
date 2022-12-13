@@ -11,10 +11,6 @@ const bcrypt = require('bcryptjs');
 
 // crée notre schéma de données dédié à l'utilisateur
 const UserSchema = mongoose.Schema({
-  userId: {
-    type: String,
-    unique: true,
-  },
   // L'email doit être unique
   email: {
     type: String,
