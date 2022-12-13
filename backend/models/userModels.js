@@ -1,10 +1,21 @@
+// Création d'un model user avec mongoose, on importe donc mongoose
+const mongoose = require('mongoose');
 require('mongoose-type-email');
 
-const mongoose = require('mongoose');
+// rajoute ce validateur 
 const validator = require('validator');
+
+// utilise l'algorithme bcrypt pour hasher le mot de passe des utilisateurs
 const bcrypt = require('bcryptjs');
 
+
+// crée notre schéma de données dédié à l'utilisateur
 const UserSchema = mongoose.Schema({
+  userId: {
+    type: String,
+    unique: true,
+  },
+  // L'email doit être unique
   email: {
     type: String,
     unique: true,
@@ -14,6 +25,7 @@ const UserSchema = mongoose.Schema({
       message: 'Please provide valid email',
     },
   },
+  // enregistrement du mot de pass
   password: {
     type: String,
     required: [true, 'Please provide password'],

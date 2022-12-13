@@ -4,10 +4,8 @@ const fs = require('fs');
 const createSauce = async (req, res) => {
   const sauceObject = JSON.parse(req.body.sauce);
 
-  console.log(req.body, req.auth)
   delete sauceObject.id
   
-
   const sauce = new Sauce({
     userId: req.auth.userId,
     name: sauceObject.name,
@@ -21,6 +19,7 @@ const createSauce = async (req, res) => {
   sauce.save().then(() => res.status(201).json({
     message: "saved",
   }))
+  console.log(sauce);
 };
 const modifySauce = async (req, res) => {
 
@@ -36,7 +35,7 @@ const deleteSauce = async (req, res) => {
           _id: req.params.id
         })
         .then(() => res.status(200).json({
-          message: 'Sauce supprimée !'
+          message: 'delete'
         }))
         .catch(error => res.status(400).json({
           error

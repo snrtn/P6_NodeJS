@@ -1,37 +1,57 @@
+// utilisation du module 'dotenv' pour masquer les informations de connexion à la base de données à l'aide de variables d'environnement
 require('dotenv').config();
+const connectDB = require('./db/connect');
+
 require('express-async-errors');
 
+// import des modules npm - Ajout des plugins externes
+// Importation d'express => Framework basé sur node.js
 const express = require('express');
+// Création d'une application express
 const app = express();
+
+// Cross Origin Resource Sharing
 const cors = require('cors')
+
+// middleware cookie
 const cookieParser = require('cookie-parser');
+
+// https://github.com/fiznool/express-mongo-sanitize
 const mongoSanitize = require('express-mongo-sanitize');
+
+// donne accès au chemin de notre système de fichier
 const path = require('path');
 
+// importe la route dédiée aux utilisateurs
 const userRouter = require('./routes/userRouter');
-const sauceRouter = require('./routes/sauceRouter');
 
-const connectDB = require('./db/connect');
+// importe la route dédiée aux sauces
+const sauceRouter = require('./routes/sauceRouter');
 
 const notFoundMiddleware = require('./middleware/not-found');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 
 app.use(mongoSanitize());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
 app.use(cors())
 app.use(cookieParser('secret'));
 
+app.use(express.urlencoded({extended: true}));
 
+// Va servir les routes dédiées aux utilisateurs
 app.use('/api/auth', userRouter);
+
+// Va servir les routes dédiées aux sauces
 app.use('/api/sauces', sauceRouter);
+
+// Gestion de la ressource image de façon statique
+// Midleware qui permet de charger les fichiers qui sont dans le repertoire images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 3000;
-
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URL);

@@ -1,8 +1,14 @@
+// récupère notre model User ,créer avec le schéma mongoose
 const User = require('../models/userModels');
-const CustomError = require('../errors');
+
+
 const { attachCookiesToResponse, createJWT } = require('../utils');
 const { StatusCodes } = require('http-status-codes');
 
+const CustomError = require('../errors');
+
+
+// sauvegarde un nouvel utilisateur
 const signup = async (req, res) => {
   const { email, password } = req.body;
 
@@ -12,9 +18,11 @@ const signup = async (req, res) => {
     throw new CustomError.BadRequestError('Email already exists');
   }
 
-  const user = await User.create({ email, password });
+  const user = await User.create({ userId, email, password });
 
-  attachCookiesToResponse({ res, user: { id: user.id, email: user.email }  });
+  attachCookiesToResponse({ res, user: { userId: user.id, id: user.id, email: user.email }  });
+
+  // enregistre l'utilisateur dans la base de données
   res.status(StatusCodes.CREATED).json({ user: user });
 };
 
@@ -35,7 +43,6 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError('Invalid Credentials Password');
   }
-  console.log(user)
   const token = createJWT( { userId: user.id, email: user.email } );
   res.status(StatusCodes.OK).json({ user: user, token: token });
 };
