@@ -15,7 +15,7 @@ const sauceController = require('../controllers/sauceController')
 router.post('/', auth, multer, sauceController.createSauce);
 
 // Route qui permet de supprimer "une sauce"
-router.put('/:id', auth, sauceController.modifySauce);
+router.put('/:id', auth, multer, sauceController.modifySauce);
 
 // Route qui permet de supprimer "une sauce"
 router.delete('/:id', auth, sauceController.deleteSauce);

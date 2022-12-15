@@ -14,18 +14,27 @@ const signup = async (req, res) => {
 
   // cherche le email
   const emailAlreadyExists = await User.findOne({ email });
+
   // si il y a même email, error
   if (emailAlreadyExists) {
     throw new CustomError.BadRequestError('Email already exists');
   }
-
+  
   // si il n'y a pas même email, create a new 
-  const user = await User.create({ email, password });
+  const user =  User.create({
+    email: email,
+    password: password
+  }).then((response) => {
+    console.log("Document inserte")
+    // enregistre l'utilisateur dans la base de données
+    res.status(StatusCodes.CREATED).json({ user: user });
+  }).catch((err) => {
+    console.log(err.Message);
+  });
 
-  attachCookiesToResponse({ res, user: { userId: user.id, email: user.email }  });
+  // attachCookiesToResponse({ res, user: { id: user.id, email: user.email }  });
 
-  // enregistre l'utilisateur dans la base de données
-  res.status(StatusCodes.CREATED).json({ user: user });
+  
 };
 
 const login = async (req, res) => {
