@@ -1,8 +1,7 @@
 // récupère notre model User ,créer avec le schéma mongoose
 const User = require('../models/userModels');
 
-
-const { attachCookiesToResponse, createJWT } = require('../utils');
+const { createJWT } = require('../utils');
 const { StatusCodes } = require('http-status-codes');
 
 const CustomError = require('../errors');
@@ -12,29 +11,17 @@ const CustomError = require('../errors');
 const signup = async (req, res) => {
   const { email, password } = req.body;
 
-  // cherche le email
   const emailAlreadyExists = await User.findOne({ email });
 
-  // si il y a même email, error
+  
   if (emailAlreadyExists) {
     throw new CustomError.BadRequestError('Email already exists');
   }
-  
-  // si il n'y a pas même email, create a new 
-  const user =  User.create({
-    email: email,
-    password: password
-  }).then((response) => {
-    console.log("Document inserte")
-    // enregistre l'utilisateur dans la base de données
-    res.status(StatusCodes.CREATED).json({ user: user });
-  }).catch((err) => {
-    console.log(err.Message);
-  });
+    
+  const user = await User.create({ email, password });
+  console.log(user)
 
-  // attachCookiesToResponse({ res, user: { id: user.id, email: user.email }  });
-
-  
+  res.status(StatusCodes.CREATED).json({ user: user });
 };
 
 const login = async (req, res) => {
