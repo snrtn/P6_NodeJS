@@ -16,32 +16,13 @@ const createSauce = async (req, res) => {
     heat: sauceObject.heat,
   })
 
-  sauce.save().then(() => res.status(201).json({
+  sauce.save()
+    .then(() => res.status(201).json({
     message: "saved",
   }))
 };
 
 const modifySauce = async (req, res, next) => {
-  // const sauceObject = req.file ? {
-  //   ...JSON.parse(req.body.sauce),
-  //   imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  // } : { ...req.body };
-
-  // delete sauceObject.userId;
-  // Sauce.findOne({_id: req.params.id})
-  //     .then((sauce) => {
-  //         if (sauce.userId != req.auth.userId) {
-  //             res.status(401).json({ message : 'Not authorized'});
-  //         } else {
-  //           Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
-  //             .then(() => res.status(200).json({message : 'Objet modifié!'}))
-  //             .catch(error => res.status(401).json({ error }));
-  //         }
-  //     })
-  //     .catch((error) => {
-  //         res.status(400).json({ error });
-  //     });
-
   let sauceObject = {};
   req.file ? (
     // Si la modification contient une image => Utilisation de l'opérateur ternaire comme structure conditionnelle.

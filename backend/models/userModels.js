@@ -2,12 +2,10 @@
 const mongoose = require('mongoose');
 require('mongoose-type-email');
 
-// rajoute ce validateur 
-const validator = require('validator');
-
-// utilise l'algorithme bcrypt pour hasher le mot de passe des utilisateurs
-const bcrypt = require('bcryptjs');
-
+// On rajoute ce validateur comme plugin
+const uniqueValidator = require('mongoose-unique-validator');
+// package qui valide l'unicité de l'email
+const sanitizerPlugin = require('mongoose-sanitizer-plugin');
 
 // crée notre schéma de données dédié à l'utilisateur
 const UserSchema = mongoose.Schema({
@@ -15,31 +13,24 @@ const UserSchema = mongoose.Schema({
   email: {
     type: String,
     unique: true,
-    required: [true, 'Please provide email'],
-    validate: {
-      validator: validator.isEmail,
-      message: 'Please provide valid email',
-    },
+    required: [true, "Veuillez entrer votre adresse email"],
+    match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Veuillez entrer une adresse email correcte"]
   },
-  // enregistrement du mot de pass
+  // enregistrement du mot de password
   password: {
     type: String,
-    required: [true, 'Please provide password'],
-    minlength: 6,
+    required: [true, "Veuillez choisir un mot de passe"]
   }
 });
 
-UserSchema.pre('save', async function () {
-  // if (!this.isModified('password')) return;
-  console.log(this.password)
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  console.log(this.password)
-});
 
-UserSchema.methods.comparePassword = async function (canditatePassword) {
-  const isMatch = await bcrypt.compare(canditatePassword, this.password);
-  return isMatch;
-};
+// Plugin pour garantir un email unique
+// On applique ce validateur au schéma avant d'en faire un modèle et on appelle la méthode plugin et on lui passe uniqueValidator
+UserSchema.plugin(uniqueValidator);
+
+// Plugin pour Mongoose qui purifie les champs du model avant de les enregistrer dans la base MongoDB.
+// On utilise le HTML Sanitizer de Google Caja pour effectuer cette désinfection.
+UserSchema.plugin(sanitizerPlugin);
+
 
 module.exports = mongoose.model('User', UserSchema);
