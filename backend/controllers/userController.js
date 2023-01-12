@@ -3,16 +3,12 @@ const User = require('../models/userModels');
 const { createJWT } = require('../utils');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
-const { response } = require('express');
 
 
 // sauvegarde un nouvel utilisateur
 const signup = async (req, res) => {
-  console.log('start');
 
   const { email, password } = req.body;
-  
-  console.log('user', email, password);
   
   // cherche le email
   const emailAlreadyExists = await User.findOne({ email });
@@ -21,13 +17,7 @@ const signup = async (req, res) => {
   if (emailAlreadyExists) {
     throw new CustomError.BadRequestError('Email already exists');
   }
-  
-  console.log('validate');
 
-
-  if (emailAlreadyExists) {
-    throw new CustomError.BadRequestError('Email already exists');
-  }
   // si il n'y a pas même email, create a new 
   var newUser = new User({
     email: email,
@@ -41,16 +31,11 @@ const signup = async (req, res) => {
     .catch(err => {
       console.error(err)
   });
-  
-
 };
 
 const login = async (req, res) => {
-  console.log('start login');
   
   const { email, password } = req.body;
-
-  console.log('entre login');
 
   if (!email || !password) {
     throw new CustomError.BadRequestError('Please provide email and password');
