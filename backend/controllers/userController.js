@@ -1,8 +1,14 @@
 // récupère notre model User ,créer avec le schéma mongoose
 const User = require('../models/userModels');
+
 const { createJWT } = require('../utils');
-const { StatusCodes } = require('http-status-codes');
+
 const CustomError = require('../errors');
+
+const { StatusCodes } = require('http-status-codes');
+
+// mot de passe plus sécure
+const bcrypt =  require("bcrypt");
 
 
 // sauvegarde un nouvel utilisateur
@@ -18,14 +24,16 @@ const signup = async (req, res) => {
     throw new CustomError.BadRequestError('Email already exists');
   }
 
+  const salt = bcrypt.genSaltSync(12);
+  const hash = bcrypt.hashSync(password, salt);
+
   // si il n'y a pas même email, create a new 
   var newUser = new User({
     email: email,
-    password: password
+    password: hash
   });
   newUser.save()
       .then(response => {
-        console.log(response)
         res.status(StatusCodes.CREATED).json({ user: response })
     })
     .catch(err => {
